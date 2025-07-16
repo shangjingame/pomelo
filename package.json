@@ -1,6 +1,6 @@
 {
   "name": "pomelo",
-  "version": "2.2.12",
+  "version": "2.2.15",
   "homepage": "https://github.com/NetEase/pomelo",
   "repository": {
     "type": "git",
@@ -36,9 +36,9 @@
     "pomelo-loader": "0.0.7",
     "pomelo-rpc": "https://github.com/shangjingame/pomelo-rpc.git#v1.0.11",
     "pomelo-protocol": "0.1.6",
-    "pomelo-admin": "https://github.com/shangjingame/pomelo-admin.git#v1.0.3",
-    "pomelo-logger": "https://github.com/shangjingame/pomelo-logger.git#v0.1.8",
-    "pomelo-scheduler": "https://github.com/shangjingame/pomelo-scheduler.git#v0.5.2",
+    "pomelo-admin": "https://github.com/shangjingame/pomelo-admin.git#v1.1.0",
+    "pomelo-logger": "https://github.com/shangjingame/pomelo-logger.git#v0.2.0",
+    "pomelo-scheduler": "https://github.com/shangjingame/pomelo-scheduler.git#v0.6.0",
     "ws": "7.3.1",
     "pomelo-protobuf": "https://github.com/shangjingame/pomelo-protobuf.git#v0.4.2",
     "node-bignumber": "1.2.1",
