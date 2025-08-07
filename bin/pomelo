@@ -360,7 +360,6 @@ function runDetachedChild(command, params, cb) {
       shell: true,
       detached: true,
       stdio: 'inherit',
-      windowsHide: true
     });
   } else {
     // Unix-like 系统解决方案
