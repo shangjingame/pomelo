@@ -14,6 +14,7 @@ var fs = require('fs'),
   starter = require('../lib/master/starter'),
   exec = require('child_process').exec,
   spawn = require('child_process').spawn,
+  spawnSync = require('child_process').spawnSync,
   version = require('../package.json').version,
   adminClient = require('pomelo-admin').adminClient,
   constants = require('../lib/util/constants'),
@@ -290,7 +291,7 @@ function createApplicationAt(ph, type) {
           for(var i = 0; i < unlinkFiles.length; ++i) {
             fs.unlinkSync(path.resolve(ph, unlinkFiles[i]));
           }
-          
+
           fs.renameSync(path.resolve(ph, 'game-server/app.js.udp'), path.resolve(ph, 'game-server/app.js'));
           rmdir(path.resolve(ph, 'web-server/public/js/lib/build'));
           rmdir(path.resolve(ph, 'web-server/public/js/lib/local'));
@@ -330,6 +331,65 @@ function createApplicationAt(ph, type) {
       }, TIME_INIT);
 }
 
+function getCurrentTTY() {
+  try {
+    console.log('1')
+    if (process.stdout.isTTY) {
+      return `/dev/fd/${process.stdout.fd}`;
+    }
+    console.log('2')
+    const tty  = spawnSync('tty', []).stdout.toString().trim();
+    if (tty && fs.existsSync(tty)) return tty;
+
+    console.log('3')
+    return '/dev/tty';
+  } catch(e) {
+    return '/dev/tty';
+  }
+}
+
+function runDetachedChild(command, params, cb) {
+  const isWindows = os.platform() === 'win32';
+
+  if (isWindows) {
+    // Windows 解决方案
+    const args = [
+      '/c', 'start', '"Child"', '/B', command, ...params
+    ]
+    return spawn('cmd.exe', args, {
+      shell: true,
+      detached: true,
+      stdio: 'inherit',
+      windowsHide: true
+    });
+  } else {
+    // Unix-like 系统解决方案
+    // const ttyPath  = getCurrentTTY();
+    // const redirectCmd = `> ${ttyPath}  2>&1`
+    // let args = [
+    //   '-c',
+    //   'exec',
+    //   'nohup',
+    //   command, ...params, `${redirectCmd} `
+    // ]
+    // return spawn('bash', args, {
+    //   shell: true,
+    //   detached: true,
+    //   stdio: 'ignore'
+    // });
+
+    const ttyPath  = getCurrentTTY();
+    const redirectCmd = `> ${ttyPath} 2>&1`;
+    const args = [
+       ...params, `${redirectCmd}`
+    ]
+    return spawn(command, args, {
+      shell: true,
+      detached: true,
+      stdio: 'inherit'
+    });
+  }
+}
 
 /**
  * Start application.
@@ -346,26 +406,31 @@ function start(opts) {
   if (!fs.existsSync(logDir)) {
     mkdir(logDir);
   }
-  
-  var ls;
+
+  var child;
   var type = opts.type || constants.RESERVED.ALL;
   var params = [absScript, 'env=' + opts.env, 'type=' + type];
   if(!!opts.id) {
     params.push('startId=' + opts.id);
   }
   if (opts.daemon) {
-    ls = spawn(process.execPath, params, {detached: true, stdio: 'ignore'});
-    ls.unref();
+    child = spawn(process.execPath, params, {detached: true, stdio: 'ignore'});
+    child.unref();
     console.log(DAEMON_INFO);
     process.exit(0);
   } else {
-    ls = spawn(process.execPath, params);
-    ls.stdout.on('data', function(data) {
-      console.log(data.toString());
-    });
-    ls.stderr.on('data', function(data) {
-      console.log(data.toString());
-    });
+    const child = runDetachedChild(process.execPath, params);
+    child.unref();
+    console.log(`parent process ${process.pid} exit`);
+    process.exit(0);
+
+    // child = spawn(process.execPath, params);
+    // child.stdout.on('data', function(data) {
+    //   console.log(data.toString());
+    // });
+    // child.stderr.on('data', function(data) {
+    //   console.log(data.toString());
+    // });
   }
 }
 
@@ -630,7 +695,7 @@ function mkdir(path, fn) {
 
 /**
  * Get user's choice on connector selecting
- * 
+ *
  * @param {Function} cb
  */
 function connectorType(cb) {
@@ -657,7 +722,7 @@ function connectorType(cb) {
 
 /**
  * Run server.
- * 
+ *
  * @param {Object} server server information
  */
 function runServer(server) {
