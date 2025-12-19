@@ -27,8 +27,8 @@
     "server"
   ],
   "dependencies": {
-    "socket.io": "2.3.0",
-    "async": "3.2.0",
+    "socket.io": "^4.8.1",
+    "async": "^3.2.6",
     "seq-queue": "0.0.5",
     "crc": "3.8.0",
     "cliff": "0.1.10",
@@ -39,11 +39,11 @@
     "pomelo-admin": "https://github.com/shangjingame/pomelo-admin.git#v1.1.0",
     "pomelo-logger": "https://github.com/shangjingame/pomelo-logger.git#v0.2.0",
     "pomelo-scheduler": "https://github.com/shangjingame/pomelo-scheduler.git#v0.6.0",
-    "ws": "7.3.1",
+    "ws": "^8.18.3",
     "pomelo-protobuf": "https://github.com/shangjingame/pomelo-protobuf.git#v0.4.2",
-    "node-bignumber": "1.2.1",
+    "node-bignumber": "^1.2.1",
     "commander": "6.0.0-0",
-    "mqtt": "4.2.6"
+    "mqtt": "^5.14.1"
   },
   "bin": {
     "pomelo": "./bin/pomelo"
